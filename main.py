@@ -12,15 +12,13 @@ Endpoints:
 import os
 import re
 import sqlite3
-import threading
-import time
 import unicodedata
-from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from pydantic import BaseModel, field_validator
+from edutictac_community.db import connect as db_connect
+from edutictac_community.ratelimit import RateLimiter
 
 DB_PATH = os.environ.get("EDUMUSIC_API_DB", "/var/lib/edumusic-api/leaderboard.db")
 MAX_SCORE = 9999
@@ -31,20 +29,11 @@ RATE_MAX = 60
 
 app = FastAPI(title="EduMúsic Leaderboard API")
 
-_rate_lock = threading.Lock()
-_rate: dict[str, deque] = defaultdict(deque)
-
-
-def _ensure_dir() -> None:
-    Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
+_rate_limiter = RateLimiter(max_calls=RATE_MAX, window_seconds=RATE_WINDOW)
 
 
 def get_conn() -> sqlite3.Connection:
-    _ensure_dir()
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
+    return db_connect(DB_PATH)
 
 
 def init_db() -> None:
@@ -98,15 +87,7 @@ def week_key(dt: datetime) -> str:
 
 
 def rate_limited(ip: str) -> bool:
-    now = time.monotonic()
-    with _rate_lock:
-        q = _rate[ip]
-        while q and now - q[0] > RATE_WINDOW:
-            q.popleft()
-        if len(q) >= RATE_MAX:
-            return True
-        q.append(now)
-    return False
+    return _rate_limiter(ip)
 
 
 class ScoreIn(BaseModel):
