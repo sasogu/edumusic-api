@@ -1,23 +1,23 @@
 # EduMúsic Leaderboard API
 
-API REST mínima (FastAPI + SQLite) para el ranking compartido de EduMúsic.
-Sustituye a Firebase Firestore (proyecto `edumusic-f67e0`), que era el backend
-del ranking hasta 2026-09.
+API REST mínima (FastAPI + SQLite) per al rànquing compartit d'EduMúsic.
+Substitueix Firebase Firestore (projecte `edumusic-f67e0`), que era el backend
+del rànquing fins a 2026-09.
 
-Usa `edutictac-community` como núcleo común para conexión SQLite con WAL y rate
-limit en memoria. La lógica de ranking semanal y global sigue siendo local de
-EduMúsic.
+Usa `edutictac-community` com a nucli comú per a connexió SQLite amb WAL i rate
+limit en memòria. La lògica de rànquing setmanal i global continua sent local
+d'EduMúsic.
 
 ## Endpoints
 
 - `GET /api/health` → `{"status": "ok"}`
-- `GET /api/scores?game_id=<id>&period=all-time|weekly&limit=<n>` → top N por puntuación (desc) y antigüedad (asc).
-- `POST /api/scores` con `{"game_id": "...", "name": "ABC", "score": 123}` → crea la entrada.
+- `GET /api/scores?game_id=<id>&period=all-time|weekly&limit=<n>` → top N per puntuació (desc) i antiguitat (asc).
+- `POST /api/scores` amb `{"game_id": "...", "name": "ABC", "score": 123}` → crea l'entrada.
 
-`name` se normaliza a 3 iniciales (A-Z0-9); `score` entre 0 y 9999. La semana
-semanal (`week_key`) se calcula en lunes 00:01 UTC, igual que el cliente.
+`name` es normalitza a 3 inicials (A-Z0-9); `score` entre 0 i 9999. La setmana
+setmanal (`week_key`) es calcula en dilluns 00:01 UTC, igual que el client.
 
-## Ejecución local
+## Execució local
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
@@ -25,18 +25,18 @@ pip install -r requirements.txt
 uvicorn main:app --host 127.0.0.1 --port 8003
 ```
 
-## Núcleo común
+## Nucli comú
 
-Dependencia estable actual:
+Dependència estable actual:
 
 ```txt
 edutictac-community @ git+https://git.edutictac.es/Edutictac/edutictac-community.git@v0.1.1
 ```
 
-Componentes reutilizados:
+Components reutilitzats:
 
-- `edutictac_community.db.connect` para SQLite con WAL.
-- `edutictac_community.ratelimit.RateLimiter` para límites en memoria.
+- `edutictac_community.db.connect` per a SQLite amb WAL.
+- `edutictac_community.ratelimit.RateLimiter` per a límits en memòria.
 
 Tests:
 
@@ -44,15 +44,21 @@ Tests:
 pytest -q
 ```
 
-## Despliegue (VPS aulessocarrades)
+## Desplegament
 
-Código en `/opt/edumusic-api`, servicio systemd `edumusic-api.service`
-(uvicorn en `127.0.0.1:8003`), expuesto por nginx en
-`edumusic.edutictac.es/api/` (mismo origen que la web, sin CORS).
+Codi en `/opt/edumusic-api`, servei systemd `edumusic-api.service`
+(uvicorn en `127.0.0.1:8003`), exposat per nginx en
+`edumusic.edutictac.es/api/` (mateix origen que la web, sense CORS).
 
-Base de datos SQLite en `/var/lib/edumusic-api/leaderboard.db`
-(sobreescribible con `EDUMUSIC_API_DB`).
+Base de dades SQLite en `/var/lib/edumusic-api/leaderboard.db`
+(sobreescrivible amb `EDUMUSIC_API_DB`).
 
-## Licencia
+## Resumen en castellano
 
-MIT (ver fichero LICENSE).
+API mínima de ranking para EduMúsic. Usa `edutictac-community` para SQLite con
+WAL y rate limit, mantiene la lógica de ranking en este servicio y se despliega
+como servicio systemd tras nginx en `edumusic.edutictac.es/api/`.
+
+## Llicència
+
+MIT (vegeu el fitxer LICENSE).
