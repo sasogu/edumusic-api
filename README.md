@@ -53,12 +53,6 @@ Codi en `/opt/edumusic-api`, servei systemd `edumusic-api.service`
 Base de dades SQLite en `/var/lib/edumusic-api/leaderboard.db`
 (sobreescrivible amb `EDUMUSIC_API_DB`).
 
-## Resumen en castellano
-
-API mínima de ranking para EduMúsic. Usa `edutictac-community` para SQLite con
-WAL y rate limit, mantiene la lógica de ranking en este servicio y se despliega
-como servicio systemd tras nginx en `edumusic.edutictac.es/api/`.
-
 ## Llicència
 
 MIT (vegeu el fitxer LICENSE).
