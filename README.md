@@ -4,6 +4,10 @@ API REST mínima (FastAPI + SQLite) para el ranking compartido de EduMúsic.
 Sustituye a Firebase Firestore (proyecto `edumusic-f67e0`), que era el backend
 del ranking hasta 2026-09.
 
+Usa `edutictac-community` como núcleo común para conexión SQLite con WAL y rate
+limit en memoria. La lógica de ranking semanal y global sigue siendo local de
+EduMúsic.
+
 ## Endpoints
 
 - `GET /api/health` → `{"status": "ok"}`
@@ -19,6 +23,25 @@ semanal (`week_key`) se calcula en lunes 00:01 UTC, igual que el cliente.
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --host 127.0.0.1 --port 8003
+```
+
+## Núcleo común
+
+Dependencia estable actual:
+
+```txt
+edutictac-community @ git+https://git.edutictac.es/Edutictac/edutictac-community.git@v0.1.1
+```
+
+Componentes reutilizados:
+
+- `edutictac_community.db.connect` para SQLite con WAL.
+- `edutictac_community.ratelimit.RateLimiter` para límites en memoria.
+
+Tests:
+
+```bash
+pytest -q
 ```
 
 ## Despliegue (VPS aulessocarrades)
